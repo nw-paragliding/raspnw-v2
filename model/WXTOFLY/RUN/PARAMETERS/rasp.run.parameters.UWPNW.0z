@@ -1,0 +1,62 @@
+@REGION_DOLIST = ( 'UWPNW' );
+
+# ---- UW data flags -------------------------------------------------------
+# These override whatever run mode is set by the run.rasp command line.
+# We use UW Atmos Lab's pre-computed WRF output, so we skip all three stages
+# of the local WRF pipeline:
+#   LGETGRIB=0    no GRIB download from NCEP NOMADS
+#   LMODELINIT=0  no WRF initialization (grib_prep / wrfsi)
+#   LMODELRUN=1   skip wrf.exe but run NCL post-processing
+#
+# wrfout files must already exist in $BASEDIR/WRF/WRFV2/RASP/UWPNW/
+# (staged there by download_uw_wrfout.sh before calling run.rasp)
+$LGETGRIB = 0;
+$LMODELINIT = 0;
+$LMODELRUN = 1;
+
+$LSEND = 2;
+if( not defined $LSAVE ) { $LSAVE = 0; }
+
+$LRUN_WINDOW{'UWPNW'} = 0;
+
+# TODO: Confirm variable list once UW wrfout files are in hand.
+# UW uses WRF-ARW so standard RASP variables should work; review which
+# pressure-level params fall within their 4km domain vertical extent.
+@{$PARAMETER_DOLIST{'UWPNW'}} = ('sfcwind','sfcwind0','sfcwind2','tenmwind','wstar',
+	'wblmaxmin','hwcrit','dwcrit','hglider','bsratio','hbl','dbl','blwind',
+	'blwindshear','bltopwind','cape','zsfclcl','zsfclclmask','zblcl','zblclmask',
+	'blcloudpct','sfcshf','sfctemp','sfcdewpt','mslpress','rain1',
+	'bltopvariab','zblcldif');
+
+$LOCALTIME_ID{'UWPNW'} = PDT;
+$LOCALTIME_ADJ{'UWPNW'} = -7;
+
+# GRIBFILE settings are not used with LGETGRIB=0 but must be defined to
+# avoid RASP errors from undefined variables.
+$GRIBFILE_MODEL = 'ETA';
+$GRIBFILES_PER_FORECAST_PERIOD{'UWPNW'} = 6;
+%GRIBFILE_DOLIST = ( 'UWPNW' => [ '0Z+12','0Z+15','0Z+18','0Z+21','0Z+24','0Z+27' ] );
+
+# Forecast period: 0z init, plot the soaring day (noon through ~03z next day).
+# UW's 4km output is hourly; DOMAIN1_STARTHH/ENDHH define the wrfout time range.
+# TODO: Adjust these once UW's actual output time range is confirmed.
+$FORECAST_PERIODHRS{'UWPNW'}[0] = 15;
+$DOMAIN1_STARTHH{'UWPNW'}[0] = '12';
+$DOMAIN1_ENDHH{'UWPNW'}[0] = '03';
+$DOMAIN2_START_DELTAMINS{'UWPNW'}[0] = 0;
+$DOMAIN2_END_DELTAMINS{'UWPNW'}[0] = 0;
+$DOMAIN3_START_DELTAMINS{'UWPNW'}[0] = 0;
+$DOMAIN3_END_DELTAMINS{'UWPNW'}[0] = 0;
+$DOMAIN1_TIMESTEP{'UWPNW'}[0] = 24;
+$BOUNDARY_UPDATE_PERIODHRS{'UWPNW'}[0] = 1;
+$NDOWN_BOUNDARY_UPDATE_PERIODHRS{'UWPNW'}[0] = 0;
+
+# TODO: Adjust image size to match UW's 4km domain extent once grid dims known.
+@{$PLOT_IMAGE_SIZE{'UWPNW'}[0]} = ( '', '2000x2000' );
+@{$PLOT_HHMMLIST{'UWPNW'}[0]} = ('1500','1600','1700','1800','1900','2000','2100','2200','2300','0000','0100','0200','0300');
+
+##############  END OF REGION DEPENDENT PARAMETERS  ##############
+##################################################################
+##########    ADDITIONS MUST BE MADE ABOVE THIS LINE    ##########
+##################################################################
+1.;

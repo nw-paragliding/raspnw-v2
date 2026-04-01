@@ -132,7 +132,31 @@ while read -r LINE || [[ -n $LINE ]]; do
 			echo "****Error: [RUN] Job $LINE not implemented"
 		fi
 		;;
-		
+
+		UWPNW)
+		if [ $IS_WINDOW == 0 ]
+		then
+			if ! ($WXTOFLY_RUN/run_uwpnw.sh $INIT $FCST_DAY)
+			then
+				echo "****Error: [RUN] Script error for job $LINE"
+			fi
+		else
+			echo "****Error: [RUN] Job $LINE not implemented"
+		fi
+		;;
+
+		WAHRRR)
+		if [ $IS_WINDOW == 0 ]
+		then
+			if ! ($WXTOFLY_RUN/run_wahrrr.sh $INIT $FCST_DAY)
+			then
+				echo "****Error: [RUN] Script error for job $LINE"
+			fi
+		else
+			echo "****Error: [RUN] Job $LINE not implemented"
+		fi
+		;;
+
 		*)
 		echo "****Error: [RUN] Invalid job name: $LINE"
 		;;

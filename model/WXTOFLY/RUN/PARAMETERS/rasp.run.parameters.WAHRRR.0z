@@ -1,0 +1,43 @@
+@REGION_DOLIST = ( 'WAHRRR' );
+$GRIBFILE_MODEL = 'HRRR';
+
+$LSEND = 2;
+if( not defined $LSEND ) { $LSEND = 0; }
+if( not defined $LSAVE ) { $LSAVE = 0; }
+
+$LRUN_WINDOW{'WAHRRR'} = 0;
+
+@{$PARAMETER_DOLIST{'WAHRRR'}} = ('sfcwind','sfcwind0','sfcwind2','tenmwind','wstar',
+	'wblmaxmin','hwcrit','dwcrit','hglider','bsratio','hbl','dbl','blwind',
+	'blwindshear','bltopwind','cape','zsfclcl','zsfclclmask','zblcl','zblclmask',
+	'blcloudpct','sfcshf','sfctemp','sfcdewpt','mslpress','rain1',
+	'bltopvariab','zblcldif');
+
+$LOCALTIME_ID{'WAHRRR'} = PDT;
+$LOCALTIME_ADJ{'WAHRRR'} = -7;
+
+# HRRR produces hourly output; 0z extended run covers through +48h.
+# Fetch hours +15 through +27 to cover the WA soaring day (15z-03z PDT).
+$GRIBFILES_PER_FORECAST_PERIOD{'WAHRRR'} = 13;
+%GRIBFILE_DOLIST = ( 'WAHRRR' => [ '0Z+15','0Z+16','0Z+17','0Z+18','0Z+19','0Z+20',
+                                    '0Z+21','0Z+22','0Z+23','0Z+24','0Z+25','0Z+26','0Z+27' ] );
+
+$FORECAST_PERIODHRS{'WAHRRR'}[0] = 12;
+$DOMAIN1_STARTHH{'WAHRRR'}[0] = '15';
+$DOMAIN1_ENDHH{'WAHRRR'}[0] = '03';
+$DOMAIN2_START_DELTAMINS{'WAHRRR'}[0] = 0;
+$DOMAIN2_END_DELTAMINS{'WAHRRR'}[0] = 0;
+$DOMAIN3_START_DELTAMINS{'WAHRRR'}[0] = 0;
+$DOMAIN3_END_DELTAMINS{'WAHRRR'}[0] = 0;
+$DOMAIN1_TIMESTEP{'WAHRRR'}[0] = 9;
+$BOUNDARY_UPDATE_PERIODHRS{'WAHRRR'}[0] = 1;
+$NDOWN_BOUNDARY_UPDATE_PERIODHRS{'WAHRRR'}[0] = 0;
+
+@{$PLOT_IMAGE_SIZE{'WAHRRR'}[0]} = ( '', '2000x2000' );
+@{$PLOT_HHMMLIST{'WAHRRR'}[0]} = ('1500','1600','1700','1800','1900','2000','2100','2200','2300','0000','0100','0200','0300');
+
+##############  END OF REGION DEPENDENT PARAMETERS  ##############
+##################################################################
+##########    ADDITIONS MUST BE MADE ABOVE THIS LINE    ##########
+##################################################################
+1.;

@@ -7,3 +7,23 @@
 node_modules
 dist
 publish
+
+# WRF geographic input data (large binary files, re-downloadable)
+model/WRF/wrfsi/extdata/GEOG/
+
+# HRRR GRIB forecast input data (re-downloadable)
+model/RASP/RUN/HRRR/GRIB/
+
+# Compiled WRF binaries and build outputs
+model/WRF/WRFV2/main/
+
+# Compiled NCL/NCARG libraries
+model/UTIL/NCARG/lib/
+
+# NCL installer download
+model/INSTALL/DOWNLOAD/NCL/
+
+# WRF domain generated data (regenerated from GEOG data)
+model/WRF/wrfsi/domains/*/static/
+model/WRF/wrfsi/domains/*/wrfprd/
+model/WRF/wrfsi/domains/*/log/

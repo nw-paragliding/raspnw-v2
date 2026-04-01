@@ -1,0 +1,49 @@
+@REGION_DOLIST = ( 'UWPNW' );
+
+# ---- UW data flags -------------------------------------------------------
+# See rasp.run.parameters.UWPNW.0z for full explanation.
+$LGETGRIB = 0;
+$LMODELINIT = 0;
+$LMODELRUN = 1;
+
+$LSEND = 2;
+if( not defined $LSAVE ) { $LSAVE = 0; }
+
+$LRUN_WINDOW{'UWPNW'} = 0;
+
+@{$PARAMETER_DOLIST{'UWPNW'}} = ('sfcwind','sfcwind0','sfcwind2','tenmwind','wstar',
+	'wblmaxmin','hwcrit','dwcrit','hglider','bsratio','hbl','dbl','blwind',
+	'blwindshear','bltopwind','cape','zsfclcl','zsfclclmask','zblcl','zblclmask',
+	'blcloudpct','sfcshf','sfctemp','sfcdewpt','mslpress','rain1',
+	'bltopvariab','zblcldif');
+
+$LOCALTIME_ID{'UWPNW'} = PDT;
+$LOCALTIME_ADJ{'UWPNW'} = -7;
+
+$GRIBFILE_MODEL = 'ETA';
+$GRIBFILES_PER_FORECAST_PERIOD{'UWPNW'} = 6;
+%GRIBFILE_DOLIST = ( 'UWPNW' => [ '12Z+00','12Z+03','12Z+06','12Z+09','12Z+12','12Z+15' ] );
+
+# Forecast period: 12z init.  UW's 4km run initializes at 12z, so the first
+# usable forecast hour is 12z itself.  Plot through 03z+1 (local soaring day).
+# TODO: Confirm UW's 12z output availability and time range.
+$FORECAST_PERIODHRS{'UWPNW'}[0] = 15;
+$DOMAIN1_STARTHH{'UWPNW'}[0] = '12';
+$DOMAIN1_ENDHH{'UWPNW'}[0] = '03';
+$DOMAIN2_START_DELTAMINS{'UWPNW'}[0] = 0;
+$DOMAIN2_END_DELTAMINS{'UWPNW'}[0] = 0;
+$DOMAIN3_START_DELTAMINS{'UWPNW'}[0] = 0;
+$DOMAIN3_END_DELTAMINS{'UWPNW'}[0] = 0;
+$DOMAIN1_TIMESTEP{'UWPNW'}[0] = 24;
+$BOUNDARY_UPDATE_PERIODHRS{'UWPNW'}[0] = 1;
+$NDOWN_BOUNDARY_UPDATE_PERIODHRS{'UWPNW'}[0] = 0;
+
+# TODO: Adjust image size to match UW's 4km domain extent once grid dims known.
+@{$PLOT_IMAGE_SIZE{'UWPNW'}[0]} = ( '', '2000x2000' );
+@{$PLOT_HHMMLIST{'UWPNW'}[0]} = ('1500','1600','1700','1800','1900','2000','2100','2200','2300','0000','0100','0200','0300');
+
+##############  END OF REGION DEPENDENT PARAMETERS  ##############
+##################################################################
+##########    ADDITIONS MUST BE MADE ABOVE THIS LINE    ##########
+##################################################################
+1.;

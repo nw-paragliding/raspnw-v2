@@ -52,6 +52,7 @@ create_namelist_template_links FRASER
 create_namelist_template_links TIGER
 create_namelist_template_links FT_EBEY
 create_namelist_template_links PNWRAT
+create_namelist_template_links WAHRRR
 
 ##############################################
 print_cyan "Creating +N domains links..."
@@ -128,6 +129,16 @@ create_all_plus_n_static_links FRASER
 create_all_plus_n_static_links TIGER
 create_all_plus_n_static_links FT_EBEY
 create_all_plus_n_static_links PNWRAT
+# WAHRRR is single-domain (d01 only) — only link d01 static files for +1
+create_plus_n_static_wrf_links WAHRRR 1
+create_plus_n_static_data_links WAHRRR 1 "latlon2d"
+create_plus_n_static_data_links WAHRRR 1 "latlon2d-mass"
+create_plus_n_static_data_links WAHRRR 1 "latlon"
+create_plus_n_static_data_links WAHRRR 1 "latlon-mass"
+create_plus_n_static_data_links WAHRRR 1 "topo"
+create_plus_n_static_data_links WAHRRR 1 "topo-mass"
+create_plus_n_static_data_links WAHRRR 1 "topography"
+create_plus_n_static_data_links WAHRRR 1 "topography-mass"
 
 ##############################################
 print_cyan "Creating WINDOW domains links  ..."

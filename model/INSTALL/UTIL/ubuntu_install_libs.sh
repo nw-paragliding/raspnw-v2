@@ -51,11 +51,16 @@ install_package_i386 "/lib/i386-linux-gnu/libz.so.1" "zlib1g"
 
 source /etc/os-release
 
-if [[ VERSION_ID == "14"* ]]
-then
-	install_package "/usr/lib/libiomp5.so" "libiomp-dev"
+# libiomp5 (Intel OpenMP runtime) — not in standard Ubuntu 20.04 repos.
+# Try to install; skip if unavailable (only needed by Intel-compiled binaries).
+if [[ VERSION_ID == "14"* ]]; then
+	LIB="/usr/lib/libiomp5.so"
 else
-	install_package "/usr/lib/x86_64-linux-gnu/libiomp5.so" "libiomp-dev"
+	LIB="/usr/lib/x86_64-linux-gnu/libiomp5.so"
+fi
+if [[ ! -f "$LIB" ]]; then
+	echo "Attempting to install libiomp5 ..."
+	sudo apt-get install -y libiomp5 2>/dev/null || echo "Warning: libiomp5 not available, skipping (may affect Intel-compiled binaries)"
 fi
 
 #missing on default install of Server

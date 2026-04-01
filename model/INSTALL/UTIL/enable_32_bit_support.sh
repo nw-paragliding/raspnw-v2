@@ -28,10 +28,6 @@ if [[ $OS == "Ubuntu" ]]; then
 		exit -1
 	fi
 
-	sudo apt-get install -y multiarch-support
-		if [ $? != 0 ] 
-	then
-		print_error "sudo apt-get install multiarch-support"
-		exit -1
-	fi
+	# multiarch-support was removed in Ubuntu 16.04+; skip gracefully if unavailable
+	sudo apt-get install -y multiarch-support 2>/dev/null || echo "Warning: multiarch-support not available (Ubuntu 16.04+), skipping"
 fi

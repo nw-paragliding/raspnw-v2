@@ -757,6 +757,7 @@ if ( $#ARGV == -1 || $ARGV[0] eq '-t' )
   $num_metgrid_levels{'GFSA'} = 52 ;
   $num_metgrid_levels{'AVN'} = 52 ;
   $num_metgrid_levels{'ETA'} = 52 ;
+  $num_metgrid_levels{'HRRR'} = 50 ;
   $num_metgrid_levels{'RUCH'} = 52 ;
 ### SET PARAMETER INFORMATION NAMES USED FOR IMAGE LOOP TITLE - note "~" escape NOT recognized by plt_text.exe 
 $paraminfo{'hglider'}       = 'Maximum Thermalling Height' ;
@@ -1178,9 +1179,14 @@ if( ! defined $ADMIN_EMAIL_ADDRESS || $ADMIN_EMAIL_ADDRESS =~ m|^\s*$| ) { die "
         $filetimes{$ifile} = sprintf 'gfs.t%02dz.pgrbf%02d',$fileanaltime,$ftime;
       }
     elsif ( $gribftpsite1 eq 'http://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'AVN' )
-      { 
+      {
         $filenamehead{$ifile} = '';
         $filetimes{$ifile} = sprintf 'gfs.t%02dz.pgrbf%02d',$fileanaltime,$ftime;
+      }
+    elsif ( $gribftpsite1 eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'HRRR' )
+      {
+        $filenamehead{$ifile} = '';
+        $filetimes{$ifile} = sprintf 'hrrr.t%02dz.wrfprsf%02d.grib2',$fileanaltime,$ftime;
       }
     if ( $ftime eq 'nl' )
        { $ftime = '00'; }
@@ -1197,7 +1203,7 @@ if( ! defined $ADMIN_EMAIL_ADDRESS || $ADMIN_EMAIL_ADDRESS =~ m|^\s*$| ) { die "
     ### average validtime to use as "current day" indicator
     $avgextendedvalidtime += $validtime ; 
     ### determine file day and adjust filevalidtime
-    if ( $GRIBFILE_MODEL eq 'ETA' || $GRIBFILE_MODEL eq 'RUCH' || $GRIBFILE_MODEL eq 'GFSN' || $GRIBFILE_MODEL eq 'GFSA' || $GRIBFILE_MODEL eq 'AVN' )
+    if ( $GRIBFILE_MODEL eq 'ETA' || $GRIBFILE_MODEL eq 'HRRR' || $GRIBFILE_MODEL eq 'RUCH' || $GRIBFILE_MODEL eq 'GFSN' || $GRIBFILE_MODEL eq 'GFSA' || $GRIBFILE_MODEL eq 'AVN' )
       { $filevaliddays{$ifile} = 'curr.'; }
     else
       { $filevaliddays{$ifile} = ''; }
@@ -1312,7 +1318,7 @@ if( ! defined $ADMIN_EMAIL_ADDRESS || $ADMIN_EMAIL_ADDRESS =~ m|^\s*$| ) { die "
   {
     ### add filename do list
     ### PARTIAL SPECIFICATION OF MODEL GRIB FILENAME HERE
-    if ( $GRIBFILE_MODEL eq 'ETA' || $GRIBFILE_MODEL eq 'GFSN' || $GRIBFILE_MODEL eq 'GFSA' || $GRIBFILE_MODEL eq 'AVN' )
+    if ( $GRIBFILE_MODEL eq 'ETA' || $GRIBFILE_MODEL eq 'HRRR' || $GRIBFILE_MODEL eq 'GFSN' || $GRIBFILE_MODEL eq 'GFSA' || $GRIBFILE_MODEL eq 'AVN' )
       {
         $filename = $filenamehead{$ifile} . $filetimes{$ifile} ;
         ### select directory based on init.time - 1=present vs 2=previous jdate
@@ -1647,13 +1653,13 @@ if( ! defined $ADMIN_EMAIL_ADDRESS || $ADMIN_EMAIL_ADDRESS =~ m|^\s*$| ) { die "
         ### (since several might have same valid time) and for efficiency (no need to look at more than one file)
         if( $LWINDOWRESTART != 1 )
         {
-          if( $GRIBFILE_MODEL ne 'ETA' )
+          if( $GRIBFILE_MODEL ne 'ETA' && $GRIBFILE_MODEL ne 'HRRR' )
           {
-            $gribprep_errout = `cd $WRFBASEDIR/WRFSI/etc ; ./grib_prep.pl -f "${filename}.*" -l 0 -t 1 -s $grib_yyyymmddhh $GRIBFILE_MODEL >| $ENV{EXT_DATAROOT}/log/grib_prep.${GRIBFILE_MODEL}.stdout`;  
+            $gribprep_errout = `cd $WRFBASEDIR/WRFSI/etc ; ./grib_prep.pl -f "${filename}.*" -l 0 -t 1 -s $grib_yyyymmddhh $GRIBFILE_MODEL >| $ENV{EXT_DATAROOT}/log/grib_prep.${GRIBFILE_MODEL}.stdout`;
           }
           else
           {
-            ### KLUDGE TO ALLOW USE OF GRIB2 ETA/NAM FILES
+            ### Convert GRIB2 to GRIB1 before passing to grib_prep (required for ETA/NAM and HRRR)
             $gribconv_errout = `cd $GRIBDIR ; rm -f "${filename}.cnvgrib.out"; ${UTILDIR}/cnvgrib -g21 -nv "${filename}" "${filename}.cnvgrib.out"`;
             if ( $gribconv_errout !~ m|^\s*$| )
             {
@@ -3477,6 +3483,18 @@ sub setup_ftp_parameters ()
     $gribftpdirectory[3] = "";
     #### IF PREVIOUS ("negative") DAY NEEDED, USE $gribftpdirectory[2]
   }
+  elsif ( $GRIBFILE_MODEL eq 'HRRR' )
+  {
+    $gribftpsite1 = 'https://nomads.ncep.noaa.gov';
+    $gribftpsiteid1 = 'HRRR';
+    $gribftpsite2 = '';
+    $gribftpsiteid2 = '';
+    $gribftpdirectory0 = "pub/data/nccf/com/hrrr/prod";
+    ### subdir includes /conus — set in do_getgrib_selection
+    $gribftpdirectory[1] = "";
+    $gribftpdirectory[2] = "";
+    $gribftpdirectory[3] = "";
+  }
   elsif ( $GRIBFILE_MODEL eq 'RUCH' )
   {
     ### $gribftpsite1,2 sets grib ftp site ($gribftpsite2=''=>no2ndSite)
@@ -3711,6 +3729,12 @@ sub do_getgrib_selection ()
                $gribftpdirectory[1] = sprintf 'gfs.%04d%02d%02d%02d',$jyr4,$jmo2,$jda2,$fileanaltimes{$ifile};
                $gribftpdirectory[0] = sprintf 'gfs.%04d%02d%02d%02d',$jyr4m1,$jmo2m1,$jda2m1,$fileanaltimes{$ifile};
                $gribftpdirectory[2] = sprintf 'gfs.%04d%02d%02d%02d',$jyr4p1,$jmo2p1,$jda2p1,$fileanaltimes{$ifile};
+             }
+             elsif ( $gribftpsite eq 'https://nomads.ncep.noaa.gov' && $GRIBFILE_MODEL eq 'HRRR' )
+             {
+               $gribftpdirectory[1] = sprintf 'hrrr.%04d%02d%02d/conus',$jyr4,$jmo2,$jda2;
+               $gribftpdirectory[2] = sprintf 'hrrr.%04d%02d%02d/conus',$jyr4m1,$jmo2m1,$jda2m1;
+               $gribftpdirectory[3] = sprintf 'hrrr.%04d%02d%02d/conus',$jyr4p1,$jmo2p1,$jda2p1;
              }
              $filenamedirectory = $gribftpdirectory[$filenamedirectoryno{$ifile}];
              $filename{$ifile} = $file;

@@ -87,4 +87,5 @@ print_cyan "Creating links in WRF/wrfsi/GRIB ..."
 create_symbolic_link $BASEDIR/RASP/RUN/AVN/GRIB $BASEDIR/WRF/wrfsi/GRIB/AVN
 create_symbolic_link $BASEDIR/RASP/RUN/ETA/GRIB $BASEDIR/WRF/wrfsi/GRIB/ETA
 create_symbolic_link $BASEDIR/RASP/RUN/GFS/GRIB $BASEDIR/WRF/wrfsi/GRIB/GFS
+create_symbolic_link $BASEDIR/RASP/RUN/HRRR/GRIB $BASEDIR/WRF/wrfsi/GRIB/HRRR
 create_symbolic_link $BASEDIR/RASP/RUN/RUCH/GRIB $BASEDIR/WRF/wrfsi/GRIB/RUCH
